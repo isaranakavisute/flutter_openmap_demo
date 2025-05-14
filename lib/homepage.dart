@@ -1,77 +1,71 @@
-import 'dart:developer';
+// homepage.dart
 import 'dart:ffi';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:testandroid2/models/user.dart';
-import 'package:testandroid2/serviceApi.dart';
+import 'package:flutter_openmap_demo/serviceApi.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter_openmap_demo/current_forecast.dart';
+import 'package:flutter_openmap_demo/wholeday_forecast.dart';
+// homepage.dart
+
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
-
+  
   @override
   State<Homepage> createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
-
-  FocusNode focususername = FocusNode();
-  FocusNode focuspassword = FocusNode();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController citynameController = TextEditingController();
 
   @override
+
   void initState() {
-
-    usernameController.text =  "Please enter username";
-    passwordController.text =  "Please enter password";
-
-    focususername.addListener(() {
-      if (focususername.hasFocus)
-       {if (usernameController.text == "Please enter username" )
-         usernameController.clear();
-       }});
-
-    focuspassword.addListener(() {
-      if (focuspassword.hasFocus) 
-      {
-        if (passwordController.text == "Please enter password" )
-         passwordController.clear();
-      }
-    });
-
     super.initState();
   }
 
-  void reset_textformfield() {
-    usernameController.text =  "Please enter username";
-    passwordController.text =  "Please enter password";
+  Future<void> goToCurrentForecast() async {
+    print(citynameController.text);
+    final weather_obj = await ServiceApi.getCurrentStatus(cityname: citynameController.text, temptype: selectedTemperatureType); 
+    print(weather_obj.main?.temp);
+    print(weather_obj.main?.feels_like);
+    print(weather_obj.main?.temp_min);
+    print(weather_obj.main?.temp_max);
+    print(weather_obj.main?.pressure);
+    print(weather_obj.main?.humidity);
+    print(weather_obj.main?.sea_level);
+    print(weather_obj.main?.grnd_level);
   }
 
-  Future<void> getLoginStatus() async {
-
-    //log(usernameController.text);
-    //log(passwordController.text);
-    //print(usernameController.text);
-    //print(passwordController.text);
-
-    final login_status = await ServiceApi.getLoginStatus(username: usernameController.text, password: passwordController.text); 
-    print(login_status.status);
-    if (login_status.status == "success")
-     print('success login');
-    else
-     print('failed login');
+  Future<void> goToAllDayForecast() async {
+    print(citynameController.text);
+    final weather_obj = await ServiceApi.getAllDayStatus(cityname: citynameController.text, temptype: ""); 
+    print(weather_obj.main?.temp);
+    print(weather_obj.main?.feels_like);
+    print(weather_obj.main?.temp_min);
+    print(weather_obj.main?.temp_max);
+    print(weather_obj.main?.pressure);
+    print(weather_obj.main?.humidity);
+    print(weather_obj.main?.sea_level);
+    print(weather_obj.main?.grnd_level);
   }
+
+  final List<String> items = [
+  'Celcius',
+  'Farenheit',
+  ];
+  String? selectedTemperatureType;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final _formKey = GlobalKey<FormState>();
-   
-
     return Scaffold(
        appBar: AppBar
        (
-        title : const Center(child: Text('Please login'))
+        title : const Center(child: Text('Open-Weather-Map Demo by Isara Nakavisute May 14 2025 23:38pm ')),
+        backgroundColor: Colors.amber,
        ),
        body: Form(
         key: _formKey,
@@ -86,71 +80,82 @@ class _HomepageState extends State<Homepage> {
          padding: const EdgeInsets.all(12),
          margin: const EdgeInsets.only(),
          width: size.width*0.80,
-        child: TextFormField(
-        //style: TextStyle(color: Colors.green),
-        focusNode: focususername,
-        controller: usernameController,
+        child: TextFormField
+        (
+        controller: citynameController,
         maxLength: 40,
         decoration: const InputDecoration(
-        hintText: "Please enter username",
-        labelText: 'Username',
-        labelStyle: TextStyle(
-        color: Colors.blueGrey,
-        ),
-        enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(
-        color: Colors.blueGrey,
+         labelText: 'City',
+         labelStyle: TextStyle(
+         color: Colors.blueGrey,
+         fontStyle: FontStyle.italic, fontSize: 20
+         ),
         ),
         ),
         ),
-        onChanged: (value) {},
-        ),
-        ),
+
 
         Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.only(),
-        width: size.width*0.80,
-        child: TextFormField(
-        //style: TextStyle(color: Colors.green),
-        focusNode: focuspassword,
-        controller: passwordController,
-        maxLength: 40,
-        decoration: const InputDecoration(
-        hintText: "Please enter password",
-        labelText: 'Password',
-        labelStyle: TextStyle(
-        color: Colors.blueGrey,
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(),
+            width: size.width*0.80,
+            child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String> (
+                        isExpanded: true,
+                        hint: Text(
+                        'Select Type of Temperature',
+                         style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).hintColor,
+                           ),
+                        ),
+                        items: items.map((String item) => DropdownMenuItem<String>(
+                         value: item,
+                         child: Text(
+                         item,
+                        style: const TextStyle(
+                         fontSize: 14,
+                         ),
+                           ),
+                        ))
+                        .toList(),
+                        value: selectedTemperatureType,
+                        onChanged: (String? value) {
+                         setState(() {
+                           selectedTemperatureType = value;
+                           print(selectedTemperatureType);
+                         });
+                        },
+                                                   ),
+                     ),
         ),
-        enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(
-        color: Colors.blueGrey,
-        ),
-        ),
-        ),
-        onChanged: (value) {},
-        ),
-        ),
-
         Row(
             mainAxisAlignment: MainAxisAlignment.center,
              children: [
-            ElevatedButton(
-             onPressed: ()=> {getLoginStatus()
-              //User obj = ServiceApi.getLoginStatus(username: usernameController.text, password: passwordController.text);
-             }, 
-             child: Text('OK') 
-             ),
-            ElevatedButton(
-             onPressed: ()=>{reset_textformfield()},
-             child: Text('CANCEL'),
-            ),
+
+              Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ElevatedButton(
+                            onPressed: ()=> {  
+                                 Navigator.push(context, MaterialPageRoute(builder: (context) => CurrentForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
+                                
+                             }, 
+                           child: Text('Current Forecast') 
+                     ),
+                   ),
+              Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ElevatedButton(
+                                          onPressed: ()=> {  
+                                                Navigator.push(context, MaterialPageRoute(builder: (context) => WholeDayForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
+                              
+                                        
+                                          }, 
+                                          child: Text('Whole-Day Forecast') 
+                                         ),
+                   ),
             ]
           ),
-        
-
-
-
         ]
        ),
        ),

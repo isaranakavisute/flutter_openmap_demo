@@ -1,4 +1,4 @@
-name: testandroid2
+name: flutter_openmap_demo
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -38,6 +38,7 @@ dependencies:
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
   http: ^1.1.0
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:

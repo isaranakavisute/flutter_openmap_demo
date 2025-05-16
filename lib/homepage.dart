@@ -7,6 +7,27 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_openmap_demo/current_forecast.dart';
 import 'package:flutter_openmap_demo/wholeday_forecast.dart';
 // homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
+// homepage.dart
 
 
 class Homepage extends StatefulWidget {
@@ -18,11 +39,20 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   final TextEditingController citynameController = TextEditingController();
-
+  final FocusNode focuscityname = FocusNode();
+  static final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   @override
 
   void initState() {
     super.initState();
+
+    focuscityname.addListener(() {
+      // if (focususername.hasFocus)
+      //  {if (usernameController.text == "Please enter username" )
+      //    usernameController.clear();
+      //  }});
+      print("textfield focused");
+    });
   }
 
   Future<void> goToCurrentForecast() async {
@@ -60,11 +90,16 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final _formKey = GlobalKey<FormState>();
+    //final _formKey = GlobalKey<FormState>();
+    //static GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
     return Scaffold(
        appBar: AppBar
        (
-        title : const Center(child: Text('Open-Weather-Map Demo by Isara Nakavisute May 14 2025 23:38pm ')),
+         title: Column(children: [
+        Text('Open-Weather-Map Demo', style:TextStyle(fontSize: 15, color: Colors.blue)),
+        Text('By', style:TextStyle(fontSize: 15, color: Colors.blue)),
+        Text('Isara Nakavisute, May 14 2025, 23:38pm', style:TextStyle(fontSize: 15, color: Colors.blue)),
+      ]),
         backgroundColor: Colors.amber,
        ),
        body: Form(
@@ -83,8 +118,28 @@ class _HomepageState extends State<Homepage> {
         child: TextFormField
         (
         controller: citynameController,
+        focusNode: focuscityname,
+        keyboardType: TextInputType.text,
         maxLength: 40,
+
+        // validator: (value) {
+        //               if (value == null) {
+        //                return 'Please enter the city name';
+        //               }
+        //               return null;
+        //               },
+
+         validator: (value) {
+                        print("in textformfield validator");
+                        print(value);
+                        if (value == "")  {
+                         return 'Please enter the city name';
+                        }
+                        return null;
+                        },
+
         decoration: const InputDecoration(
+        border: OutlineInputBorder(), 
          labelText: 'City',
          labelStyle: TextStyle(
          color: Colors.blueGrey,
@@ -94,14 +149,27 @@ class _HomepageState extends State<Homepage> {
         ),
         ),
 
+         
+        
+
 
         Container(
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(),
             width: size.width*0.80,
             child: DropdownButtonHideUnderline(
-                    child: DropdownButton2<String> (
+                    // child: DropdownButton2<String> (
+                    child: DropdownButtonFormField2<String> (
                         isExpanded: true,
+
+                        validator: (value) {
+                        if (value == null) {
+                         return 'Please select the type of temperature';
+                        }
+                        return null;
+                        },
+
+
                         hint: Text(
                         'Select Type of Temperature',
                          style: TextStyle(
@@ -126,6 +194,9 @@ class _HomepageState extends State<Homepage> {
                            print(selectedTemperatureType);
                          });
                         },
+
+                    
+                      
                                                    ),
                      ),
         ),
@@ -137,7 +208,8 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.all(5.0),
                     child: ElevatedButton(
                             onPressed: ()=> {  
-                                 Navigator.push(context, MaterialPageRoute(builder: (context) => CurrentForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
+                                 if (_formKey.currentState!.validate())
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => CurrentForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
                                 
                              }, 
                            child: Text('Current Forecast') 
@@ -147,7 +219,8 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.all(5.0),
                     child: ElevatedButton(
                                           onPressed: ()=> {  
-                                                Navigator.push(context, MaterialPageRoute(builder: (context) => WholeDayForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
+                                                if (_formKey.currentState!.validate())
+                                                 Navigator.push(context, MaterialPageRoute(builder: (context) => WholeDayForecast(cityname: citynameController.text, temptype: selectedTemperatureType) ) )
                               
                                         
                                           }, 
